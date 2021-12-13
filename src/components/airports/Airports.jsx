@@ -1,16 +1,18 @@
-import React, {useState, useContext, useEffect} from 'react';
+import React, {useState, useEffect} from 'react';
 import cl from "./Airports.module.css";
 import Airport from './Airport'
 import axios from "axios";
-import {AuthContext} from "../../context";
+import {useAuth0} from "@auth0/auth0-react";
+
 
 const Airports = (props) => {
 
-    const {token} = useContext(AuthContext);
+    const {getAccessTokenSilently} = useAuth0();
     const[airports,setAirports] = useState([]);
 
     async function fetchAirports(){
         try{
+            const token = await getAccessTokenSilently();
             const response = await axios.get('/airports',{
                 headers:{"Authorization":`Bearer ${token}`},
             });
@@ -23,6 +25,7 @@ const Airports = (props) => {
     useEffect(() =>{
         async function fetchAirports(){
             try{
+                const token = await getAccessTokenSilently();
                 const response = await axios.get('/airports',{
                     headers:{"Authorization":`Bearer ${token}`},
                 });

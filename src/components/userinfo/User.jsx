@@ -1,5 +1,4 @@
-import React,{useContext,useState} from 'react';
-import {AuthContext} from "../../context";
+import React,{useState} from 'react';
 import cl from './User.module.css'
 import ImageSrc from "../../img/avia.png"
 import axios from "axios";
@@ -7,14 +6,16 @@ import ModalWindow from "../modalWindow/ModalWindow";
 import Button from "../intro/Button";
 import MiniFlights from '../flights/MiniFlights'
 import MiniHotels from '../hotels/MiniHotels'
+import {useAuth0} from "@auth0/auth0-react";
 
 
 const User = (props) => {
 
+    const {user,getAccessTokenSilently} = useAuth0();
+
     const [modal,setModal] = useState(false);
     const [inp,setInp] = useState('');
 
-    const {token} = useContext(AuthContext);
     const [flights,setFlights] = useState([]);
     const [hotels,setHotels] = useState([]);
     const [history_flights,setHistoryFLights] = useState([]);
@@ -26,11 +27,13 @@ const User = (props) => {
 
     async function fetchUserFlights(event,state) {
         try {
+            const token = await getAccessTokenSilently();
             event.preventDefault();
             const response = await axios.get('/flights/user',{
                 headers:{"Authorization":`Bearer ${token}`},
                 params:{
-                    active:state
+                    active:state,
+                    email:user.email
                 }
             });
             if(state === 1) {
@@ -48,11 +51,13 @@ const User = (props) => {
 
     async function fetchUserHotels(event,state) {
         try {
+            const token = await getAccessTokenSilently();
             event.preventDefault();
             const response = await axios.get('/hotels/user',{
                 headers:{"Authorization":`Bearer ${token}`},
                 params:{
-                    active:state
+                    active:state,
+                    email:user.email
                 }
             });
             if(state === 1) {
@@ -75,11 +80,13 @@ const User = (props) => {
 
     async function addBalance(event,value){
         try{
+            const token = await getAccessTokenSilently();
             event.preventDefault();
             const response = await axios.post('/auth/balance',{
                 value:value
-            },{
-                headers:{"Authorization":`Bearer ${token}`},
+            }, {
+                headers: {"Authorization": `Bearer ${token}`},
+                params: {email:user.email}
             })
             console.log(response);
             setInp('');
@@ -107,18 +114,17 @@ const User = (props) => {
                     </div>
                 </div>
             </ModalWindow>
-            <img className = {cl.img} src = {ImageSrc}/>
+            <img alt="airplane" className = {cl.img} src = {ImageSrc}/>
             <h2>Имя пользователя</h2>
             <div className = {cl.user_info}>
-                {props.user.username}
+                {user.nickname}
             </div>
             <h2>Роль</h2>
             <div className = {cl.user_info}>
-                {props.user.role}
             </div>
             <h2>Баланс</h2>
             <div  className = {`${cl.user_info}`}>
-                {props.user.balance}
+                {props.user1.balance}
                 <p onClick = {() => showModal(true)} className={cl.l}/>
             </div>
             <h2>Номер</h2>

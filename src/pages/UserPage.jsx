@@ -9,25 +9,64 @@ import Hotels from "../components/hotels/Hotels";
 import FilterFlights from "../components/filter/FilterFlights";
 import FilterHotels from "../components/filter/FilterHotels";
 import {Link} from "react-router-dom";
+import LogoutButton from "../components/intro/LogoutButton";
+import {useAuth0} from "@auth0/auth0-react";
 
 const UserPage = () => {
+
+    const {isAuthenticated,user,getAccessTokenSilently} = useAuth0();
+
 
     const linkStyle = {
         'text-decoration':'none'
     }
 
-    useEffect(()=>{
-        if (localStorage.getItem('token')){
-            setToken(localStorage.getItem('token'))
+    const {admin,setIsAdmin,created,setCreated} = useContext(AuthContext);
+
+    async function loginAndCreate()
+    {
+        try {
+            if (!created) {
+                setCreated(true);
+                const token = await getAccessTokenSilently();
+                const response = await axios.post('/auth/create', {
+                    email: user.email
+                }, {
+                    headers: {
+                        "Authorization": `Bearer ${token}`
+                    }
+                })
+                console.log(response)
+                const response2 = await axios.get('/auth/admin', {
+                    headers: {
+                        "Authorization": `Bearer ${token}`
+                    }
+                })
+                if (response2.data.role === 'admin') {
+                    console.log('fine');
+                    setIsAdmin(true);
+                    console.log(admin);
+
+                }
+            }
+        }catch(e)
+        {
+            console.log(e);
+        }
+    }
+
+    useEffect (()=>{
+        if (isAuthenticated)
+        {
+            loginAndCreate();
         }
     },[]) // eslint-disable-line react-hooks/exhaustive-deps
-    useEffect( () => {
+/*    useEffect( () => {
         if(localStorage.getItem('admin'))
         {
             setIsAdmin(true);
         }
-    },[]) // eslint-disable-line react-hooks/exhaustive-deps
-    const {token,setToken,setIsAuth,admin,setIsAdmin} = useContext(AuthContext);
+    },[])*/ // eslint-disable-line react-hooks/exhaustive-deps
     const [flights, setFlights] = useState([]);
     const [hotels,setHotels] = useState([]);
     const [flights_hotels,setFlights_Hotels] = useState(null);
@@ -35,6 +74,7 @@ const UserPage = () => {
     async function fetchHotels(event,inp1,inp2,inp10,inp12) {
         try {
             event.preventDefault();
+            const token = await getAccessTokenSilently();
             const response = await axios.get('/hotels',{
                 headers:{"Authorization":`Bearer ${token}`},
                 params:{
@@ -57,6 +97,7 @@ const UserPage = () => {
     async function fetchFlights(event,inp1,inp2,inp3,inp4,inp5,inp7,inp8,inp10,inp12,inp13) {
         try {
             event.preventDefault();
+            const token = await getAccessTokenSilently();
             const response = await axios.get('/flights',{
                 headers:{"Authorization":`Bearer ${token}`},
                 params:{
@@ -82,13 +123,6 @@ const UserPage = () => {
         }
     }
 
-    const logout = () => {
-        setIsAuth(false);
-        localStorage.removeItem('auth');
-        setIsAdmin(false);
-        localStorage.removeItem('admin');
-
-    }
 
     return (
         <div className = "intro2">
@@ -103,9 +137,7 @@ const UserPage = () => {
                     <Button button = {{title:"Admin panel", class:"btn btn5", click: ()=>{}, showText:()=>{}}}/>
                 </div>
                 </Link> : null}
-                <div  className = "btn_container" onClick = {logout}>
-                    <Button button = {{title:"Logout", class:"btn btn4", click: ()=>{}, showText:()=>{}}}/>
-                </div>
+                <LogoutButton />
             </div>
             <Flight_Hotels_NAV fetchFlights = {fetchFlights} fetchHotels = {fetchHotels} />
             {!flights_hotels ? <Flights flights = {flights}/> : <Hotels hotels = {hotels}/>}

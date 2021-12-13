@@ -21,7 +21,7 @@ const AboutItem = (props) => {
     return (
         <div onClick = {active_drop_info} ref = {clickRef} className = "about_item">
             <div className="about_image">
-                <img src={props.item.img} />
+                <img alt="item" src={props.item.img} />
             </div>
             <div className="about_text">
                 {props.item.text}

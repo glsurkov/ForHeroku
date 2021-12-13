@@ -2,16 +2,18 @@ import React,{useEffect,useContext,useState} from 'react';
 import cl from './Image.module.css'
 import axios from "axios";
 import {AuthContext} from "../../context";
+import {useAuth0} from "@auth0/auth0-react";
 
 const Image = (props) => {
 
-
-    const {token,admin} = useContext(AuthContext);
+    const {getAccessTokenSilently} = useAuth0()
+    const {admin} = useContext(AuthContext);
     const [image,setImage] = useState(null);
 
 
     async function deleteImage(e){
         try{
+            const token = await getAccessTokenSilently();
             e.preventDefault();
             const response = await axios.delete('/hotels/image',{
                 params:{
@@ -31,6 +33,7 @@ const Image = (props) => {
 
     async function fetchImage(){
         try{
+            const token = await getAccessTokenSilently();
             const response = await axios.get('/hotels/image',{
                 params:{
                     image:props.path
@@ -55,7 +58,7 @@ const Image = (props) => {
 
     return (
         <div className = {cl.container}>
-            <img className = {cl.image_box} src = {image} />
+            <img alt="hotelimage" className = {cl.image_box} src = {image} />
             { admin ?
             <p onClick = {e => {deleteImage(e); props.fetchImages(e)}} className = {cl.delete}/> : null}
         </div>

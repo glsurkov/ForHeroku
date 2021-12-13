@@ -4,12 +4,14 @@ import axios from "axios";
 import {AuthContext} from "../../context";
 import ModalWindow from "../modalWindow/ModalWindow";
 import Button from "../intro/Button";
-import cl2 from "../signForm/SignForm.module.css";
+import cl2 from "../signForm/SignForm.css";
 import  cl3 from "../airports/Airport.module.css"
+import {useAuth0} from "@auth0/auth0-react";
 
 const Hotel = (props) => {
 
-    const {admin,token} = useContext(AuthContext);
+    const {admin} = useContext(AuthContext);
+    const {getAccessTokenSilently,user} = useAuth0()
 
     const [modal,setModal] = useState(false);
     const [modal2,setModal2] = useState(false);
@@ -24,6 +26,7 @@ const Hotel = (props) => {
 
     async function updateHotel(event)
     {
+        const token = await getAccessTokenSilently();
         try{
             event.preventDefault()
             const response = await axios.put('/hotels',{
@@ -52,19 +55,23 @@ const Hotel = (props) => {
 
     async function bookHotel(event,id,price,inp1,inp2){
         try{
+            const token = await getAccessTokenSilently();
             event.preventDefault();
             const response = await axios.post('/bookings/hotel',{
                     room_price: price,
                     hotel_id: id,
                     arrival_date:inp1,
-                    departure_date:inp2
+                    departure_date:inp2,
                 },
                 {
-                    headers:{'Authorization':`Bearer ${token}`}
+                    headers:{'Authorization':`Bearer ${token}`},
+                    params:{
+                        email:user.email
+                    }
                 });
             console.log(response);
-            setInp1(null);
-            setInp2(null);
+            setInp1('');
+            setInp2('');
         }catch(e)
         {
             console.log(e);
@@ -74,6 +81,7 @@ const Hotel = (props) => {
 
     async function deleteHotel(event,id){
         try{
+            const token = await getAccessTokenSilently();
             event.preventDefault();
             const response = await axios.delete('/hotels',{
                 headers:{"Authorization":`Bearer ${token}`},

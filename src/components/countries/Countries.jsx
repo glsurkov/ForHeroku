@@ -1,12 +1,12 @@
-import React, {useContext, useEffect, useState} from 'react';
+import React, { useEffect, useState} from 'react';
 import cl from "../airports/Airports.module.css";
 import Country from "./Country";
-import {AuthContext} from "../../context";
 import axios from "axios";
+import {useAuth0} from "@auth0/auth0-react";
 
 const Countries = (props) => {
 
-    const {token} = useContext(AuthContext);
+    const {getAccessTokenSilently} = useAuth0()
     const[countries,setCountries] = useState([]);
 
     useEffect(() => {
@@ -15,6 +15,7 @@ const Countries = (props) => {
 
     async function fetchCountries(){
         try{
+            const token = await getAccessTokenSilently();
             const response = await axios.get('/countries',{
                 headers:{"Authorization":`Bearer ${token}`},
             });
@@ -24,9 +25,6 @@ const Countries = (props) => {
                 console.log(e);
             }
         }
-
-
-
 
             return (
         <div className = {cl.container}>

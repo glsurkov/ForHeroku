@@ -1,14 +1,14 @@
-import React,{useContext,useState,useEffect} from 'react';
+import React,{useState,useEffect} from 'react';
 import cl from "../flights/miniFlight.module.css";
-import {AuthContext} from "../../context";
 import axios from 'axios'
 import ModalWindow from "../modalWindow/ModalWindow";
 import Button from '../intro/Button'
 import Images from "./Images";
+import {useAuth0} from "@auth0/auth0-react";
 
 const MiniHotel = (props) => {
 
-    const {token} = useContext(AuthContext);
+    const {getAccessTokenSilently} = useAuth0();
     const [modal,setModal] = useState(false);
     const [file,setFile] = useState('');
     const [filePath,setFilepath] = useState('Choose File');
@@ -20,6 +20,7 @@ const MiniHotel = (props) => {
 
     async function fetchImages(){
         try{
+            const token = await getAccessTokenSilently();
             const response = await axios.get('/hotels/images',{
                 headers:{
                     'Authorization':`Bearer ${token}`
@@ -41,6 +42,7 @@ const MiniHotel = (props) => {
         const formData = new FormData();
         formData.append('hotelimage',file)
         try{
+            const token = await getAccessTokenSilently();
           const response = await axios.post('/hotels/upload',formData,{
               headers:{
                   'Content-type':'multipart/form-data',
@@ -61,6 +63,7 @@ const MiniHotel = (props) => {
 
     async function getHotel(e,hotel_id){
         try{
+            const token = await getAccessTokenSilently();
             e.preventDefault();
             const response = await axios.get('/hotels/',{
                 headers: {'Authorization':`Bearer ${token}`},

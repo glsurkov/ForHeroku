@@ -3,13 +3,15 @@ import cl from "../airports/Airport.module.css";
 import axios from "axios";
 import {AuthContext} from "../../context";
 import ModalWindow from "../modalWindow/ModalWindow";
-import cl2 from "../signForm/SignForm.module.css";
+import cl2 from "../signForm/SignForm.css";
 import Button from "../intro/Button";
+import {useAuth0} from "@auth0/auth0-react";
 
 
 const Country = (props) => {
 
-    const {token,admin} = useContext(AuthContext);
+    const {getAccessTokenSilently} = useAuth0()
+    const {admin} = useContext(AuthContext);
     const [modal,setModal] = useState(false);
     const [country,setCountry] = useState(props.country.country_name)
     const [population,setPopulation] = useState(props.country.population)
@@ -17,6 +19,7 @@ const Country = (props) => {
 
     async function updateCountry(event){
         try{
+            const token = await getAccessTokenSilently();
             event.preventDefault()
             const response = await axios.put('/countries',{
                 country_name:country,
@@ -37,6 +40,7 @@ const Country = (props) => {
 
     async function deleteCountry(event,name){
         try{
+            const token = await getAccessTokenSilently();
             event.preventDefault();
             const response = await axios.delete('/countries',{
                 headers:{"Authorization":`Bearer ${token}`},

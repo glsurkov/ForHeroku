@@ -1,12 +1,11 @@
-import React, {useContext, useState} from 'react';
-import cl from "../signForm/SignForm.module.css";
+import React, { useState} from 'react';
 import Button from "../intro/Button";
-import {AuthContext} from "../../context";
 import axios from "axios";
+import {useAuth0} from "@auth0/auth0-react";
 
 const CreateFlight = () => {
 
-
+    const {getAccessTokenSilently} = useAuth0();
     const [name,setName] = useState('')
     const [departure_date,setDeparture_date] = useState('')
     const [departure_time,setDeparture_time] = useState('')
@@ -17,10 +16,10 @@ const CreateFlight = () => {
     const [tickets_in_stock,setTickets_in_stock] = useState('')
     const [ticket_price,setTicket_price] = useState('')
 
-    const {token} = useContext(AuthContext)
 
     async function addFlight(){
         try {
+            const token = await getAccessTokenSilently();
             const response = await axios.post('/flights',{
                 company_name:`${name}`,
                 departure_date:departure_date,
@@ -50,16 +49,16 @@ const CreateFlight = () => {
 
 
     return (
-        <div className={cl.SignForm}>
-            <input value = {name} onChange = {e => setName(e.target.value)} className = {cl.Input} placeholder="Название авиакомпании"/>
-            <input value = {departure_date} onChange = {e => setDeparture_date(e.target.value)} className = {cl.Input} placeholder="Дата вылета"/>
-            <input value = {departure_time} onChange = {e => setDeparture_time(e.target.value)} className = {cl.Input} placeholder="Время вылета"/>
-            <input value = {departure_airport_name} onChange = {e => setDeparture_airport_name(e.target.value)} className = {cl.Input} placeholder="Аэропорт вылета"/>
-            <input value = {arrival_date} onChange = {e => setArrival_date(e.target.value)} className = {cl.Input} placeholder="Дата прилета"/>
-            <input value = {arrival_time} onChange = {e => setArrival_time(e.target.value)} className = {cl.Input} placeholder="Время прилета"/>
-            <input value = {arrival_airport_name} onChange = {e => setArrival_airport_name(e.target.value)} className = {cl.Input} placeholder="Аэропорт прилета"/>
-            <input value = {tickets_in_stock} onChange = {e => setTickets_in_stock(e.target.value)} className = {cl.Input} placeholder="Количество билетов"/>
-            <input value = {ticket_price} onChange = {e => setTicket_price(e.target.value)} className = {cl.Input} placeholder="Цена билета"/>
+        <div className='SignForm'>
+            <input value = {name} onChange = {e => setName(e.target.value)} className = 'Input' placeholder="Название авиакомпании"/>
+            <input value = {departure_date} onChange = {e => setDeparture_date(e.target.value)} className = 'Input' placeholder="Дата вылета"/>
+            <input value = {departure_time} onChange = {e => setDeparture_time(e.target.value)} className = 'Input' placeholder="Время вылета"/>
+            <input value = {departure_airport_name} onChange = {e => setDeparture_airport_name(e.target.value)} className = 'Input' placeholder="Аэропорт вылета"/>
+            <input value = {arrival_date} onChange = {e => setArrival_date(e.target.value)} className = 'Input' placeholder="Дата прилета"/>
+            <input value = {arrival_time} onChange = {e => setArrival_time(e.target.value)} className = 'Input' placeholder="Время прилета"/>
+            <input value = {arrival_airport_name} onChange = {e => setArrival_airport_name(e.target.value)} className = 'Input' placeholder="Аэропорт прилета"/>
+            <input value = {tickets_in_stock} onChange = {e => setTickets_in_stock(e.target.value)} className = 'Input' placeholder="Количество билетов"/>
+            <input value = {ticket_price} onChange = {e => setTicket_price(e.target.value)} className = 'Input' placeholder="Цена билета"/>
             <div onClick = {addFlight}>
                 <Button button = {{title:"Submit", class:"btn btn3", click: ()=>{}, showText:()=>{}}}/>
             </div>

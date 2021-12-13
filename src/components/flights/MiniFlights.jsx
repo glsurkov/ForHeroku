@@ -9,7 +9,7 @@ const MiniFlights = (props) => {
     return (
         <div className = {cl.container}>
             {props.flights.map((flight) =>
-                <MiniFlight flight = {flight} key={flight.flight_id}/>
+                <MiniFlight flight = {flight} key={flight["flights.users_flight.flight_order"]}/>
             )}
         </div>
     );

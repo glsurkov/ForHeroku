@@ -3,12 +3,14 @@ import cl from "./Airport.module.css";
 import {AuthContext} from "../../context";
 import axios from "axios";
 import ModalWindow from "../modalWindow/ModalWindow";
-import cl2 from "../signForm/SignForm.module.css";
+import cl2 from "../signForm/SignForm.css";
 import Button from "../intro/Button";
+import {useAuth0} from "@auth0/auth0-react";
 
 const Airport = (props) => {
 
-    const {token,admin} = useContext(AuthContext);
+    const {getAccessTokenSilently} = useAuth0();
+    const {admin} = useContext(AuthContext);
     const [airport,setAirport] = useState(props.airport.airport_name);
     const [country,setCountry] = useState(props.airport.airport_country);
     const [city,setCity] = useState(props.airport.airport_city);
@@ -16,6 +18,7 @@ const Airport = (props) => {
 
     async function deleteAirport(event,id){
         try{
+            const token = await getAccessTokenSilently();
             event.preventDefault();
             const response = await axios.delete('/airports',{
                 headers:{"Authorization":`Bearer ${token}`},
@@ -32,6 +35,7 @@ const Airport = (props) => {
 
     async function updateAirport(event){
         try{
+            const token = await getAccessTokenSilently();
             event.preventDefault()
             const response = await axios.put('/airports',{
                 airport_name:airport,

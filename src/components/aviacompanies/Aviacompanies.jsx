@@ -1,16 +1,18 @@
-import React, {useContext, useEffect, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import cl from "../airports/Airports.module.css";
 import Aviacompany from "./Aviacompany";
-import {AuthContext} from "../../context";
+
 import axios from "axios";
+import {useAuth0} from "@auth0/auth0-react";
 
 const Aviacompanies = (props) => {
 
-    const {token} = useContext(AuthContext);
+   const {getAccessTokenSilently} = useAuth0()
     const[aviacompanies,setAviacompanies] = useState([]);
 
     async function fetchAviacompanies(){
         try{
+            const token = await getAccessTokenSilently();
             const response = await axios.get('/aviacompanies',{
                 headers:{"Authorization":`Bearer ${token}`},
             });

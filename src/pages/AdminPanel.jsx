@@ -1,4 +1,4 @@
-import React, {useContext, useState} from 'react';
+import React, {useState} from 'react';
 import ModalWindow from "../components/modalWindow/ModalWindow";
 import CreateFlight from "../components/createBookings/CreateFlight";
 import CreateHotel from "../components/createBookings/CreateHotel";
@@ -12,11 +12,13 @@ import Airports from '../components/airports/Airports'
 import Hotels from '../components/hotels/Hotels'
 import Countries from '../components/countries/Countries'
 import axios from "axios";
-import {AuthContext} from "../context";
 import Aviacompanies from "../components/aviacompanies/Aviacompanies";
+import {useAuth0} from "@auth0/auth0-react";
+
+
 const AdminPanel = () => {
 
-    const {token} = useContext(AuthContext);
+    const {getAccessTokenSilently} = useAuth0();
     const [flights,setFlights] = useState([]);
     const [hotels,setHotels] = useState([]);
     const [airportState,setAirportState] = useState(false);
@@ -25,6 +27,7 @@ const AdminPanel = () => {
 
     async function fetchHotels(event) {
         try {
+            const token = await getAccessTokenSilently();
             event.preventDefault();
             const response = await axios.get('/hotels',{
                 headers:{"Authorization":`Bearer ${token}`}
@@ -40,6 +43,7 @@ const AdminPanel = () => {
 
     async function fetchFlights(event) {
         try {
+            const token = await getAccessTokenSilently();
             event.preventDefault();
             const response = await axios.get('/flights',{
                 headers:{"Authorization":`Bearer ${token}`},

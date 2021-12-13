@@ -1,25 +1,26 @@
-import React,{useContext,useState,useEffect} from 'react';
-import {AuthContext} from "../context";
+import React,{useState,useEffect} from 'react';
 import axios from "axios";
 import User from "../components/userinfo/User";
 import {Link} from "react-router-dom"
 import Button from "../components/intro/Button";
+import {useAuth0} from "@auth0/auth0-react";
 
 const Profile = () => {
 
-    const {token} = useContext(AuthContext);
-    const [user,setUser] = useState({});
+    const {getAccessTokenSilently,user} = useAuth0();
+    const [user1,setUser1] = useState({});
 
     async function fetchUser()
     {
+        const token = await getAccessTokenSilently();
         try {
             const response = await axios.get('/auth/user', {
                 headers: {"Authorization": `Bearer ${token}`},
                 params:{
-                    id:localStorage.getItem('id')
+                    email:user.email
                 }
             });
-            setUser(response.data);
+            setUser1(response.data);
         }catch(e)
         {
             console.log(e);
@@ -32,7 +33,7 @@ const Profile = () => {
 
     return (
         <div className = "intro2">
-            <User user={user} fetchUser={fetchUser}/>
+            <User user1={user1} fetchUser={fetchUser}/>
             <Link to = "/userpage"style = {{"text-decoration":"none"}}>
                 <div className = "btn_container back_btn">
                     <Button button = {{title:"Back",class:"btn btn5 btn6", click:()=>{},showText:()=>{}}}/>

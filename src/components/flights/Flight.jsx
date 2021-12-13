@@ -3,13 +3,15 @@ import cl from "./Flight.module.css"
 import axios from "axios";
 import {AuthContext} from "../../context";
 import ModalWindow from "../modalWindow/ModalWindow";
-import cl2 from "../signForm/SignForm.module.css";
+import cl2 from "../signForm/SignForm.css";
 import Button from "../intro/Button";
 import cl3 from "../airports/Airport.module.css";
+import {useAuth0} from "@auth0/auth0-react";
 
 const Flight = (props) => {
 
-    const {token,admin} = useContext(AuthContext);
+    const {getAccessTokenSilently,user} = useAuth0()
+    const {admin} = useContext(AuthContext);
     const [modal,setModal] = useState(false);
     const [company,setCompany] = useState(props.flight.aviacompany.company_name);
     const [dep_date,setDep_date] = useState(props.flight.departure_date);
@@ -24,6 +26,7 @@ const Flight = (props) => {
 
     async function updateFlight(event){
         try{
+            const token = await getAccessTokenSilently();
             event.preventDefault()
             const response = await axios.put('/flights',{
                 company_name:company,
@@ -60,13 +63,17 @@ const Flight = (props) => {
 
     async function bookFlight(event,id,price){
         try{
+            const token = await getAccessTokenSilently();
             event.preventDefault();
             const response = await axios.post('/bookings/flight',{
                 ticket_price: price,
-                flight_id: id
+                flight_id: id,
             },
                 {
-                headers:{'Authorization':`Bearer ${token}`}
+                headers:{'Authorization':`Bearer ${token}`},
+                    params:{
+                        email:user.email
+                    }
             });
             console.log(response);
         }catch(e)
@@ -79,6 +86,7 @@ const Flight = (props) => {
 
     async function deleteFlight(event,id){
         try{
+            const token = await getAccessTokenSilently();
             event.preventDefault();
             const response = await axios.delete('/flights',{
                 headers:{"Authorization":`Bearer ${token}`},
